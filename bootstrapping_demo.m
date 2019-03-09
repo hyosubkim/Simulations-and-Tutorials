@@ -52,3 +52,12 @@ meanRatio=line([mean(ratio) mean(ratio)], [min(ylim) max(ylim)],'color','--k','l
 CI_lb=line([lb lb], [min(ylim) max(ylim)],'color','k','linewidth',2)
 CI_ub=line([ub ub], [min(ylim) max(ylim)],'color','k','linewidth',2)
 title('Bootstrapped distribution of HA ratios (Aspirin/Placebo)')
+
+%What are other times you would use bootstrapping? 
+%It's great for estimating CIs because it makes no assumptions about the
+%distribution of the data (ie, you can get reliable bootstrapped CIs for 
+%all types of distributions--skewed, uniform, whatever). Why? think Central
+%Limit Theorem. You can apply this idea to statistical tests as well,
+%especially when your data are non-normally distributed. We'll next go over
+%non-parametric permutation tests, which won't seem as abstract now that
+%you understand the basic idea of resampling.
