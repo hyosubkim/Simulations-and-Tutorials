@@ -2,9 +2,10 @@
 
 % This example has been adapted from an excellent series of lectures that 
 % goes in depth with the theory and application of resampling methods and 
-% much much more at: http://www.cns.nyu.edu/~eero/math-tools/. 
+% much much more: http://www.cns.nyu.edu/~eero/math-tools/. 
 
-% Q: Does taking aspirin reduce your risk of heart attack?
+% Q: Does taking aspirin reduce your risk of heart attack? 
+% These are data from a famous study done back in the 80s.
 nA = 11037; %total number of participants taking aspirin
 nAH = 104; %number of aspirin takers who ended up having a heart attack
 nP = 11034; %total number of participants on a placebo
