@@ -1,5 +1,7 @@
 %% Bootstrapping -- classic example from Efron and Tibshirani book ("An Introduction to the Bootstrap")
 
+clear all; close all; clc
+
 % This example has been adapted from an excellent series of lectures that 
 % goes in depth with the theory and application of resampling methods and 
 % much much more: http://www.cns.nyu.edu/~eero/math-tools/. 
@@ -11,7 +13,7 @@ nAH = 104; %number of aspirin takers who ended up having a heart attack
 nP = 11034; %total number of participants on a placebo
 nPH = 189; %number of placebo takers who had a heart attack
 empiricalRatio = (nAH/nA)/(nPH/nP); %experimentally observed ratio of HAs in Aspirin vs Placebo groups (i.e., Experimental Results)
-nSamples = 1e5; %number of times to resample (you can play around with this value and see how stable your estimates are)
+nSamples = 1e4; %number of times to resample (you can play around with this value and see how stable your estimates are)
 ratio = zeros(nSamples,1); %initialize and preallocate (makes code run faster)
 
 A1 = ones(nAH,1); %we code those who had a heart attack with a 1
@@ -40,8 +42,8 @@ lbPercentile = 2.5; ubPercentile = 97.5; %you could change these if you want som
 sortedRatio = sort(ratio); 
 lbIdx = round(nSamples/100*lbPercentile); %Find index of the lower bound
 ubIdx = round(nSamples/100*ubPercentile); %Find index of upper bound 
-lb = sortedRatio(lowerBoundIndex); %Find actual lower bound value
-ub = sortedRatio(upperBoundIndex); %Find actual higher bound value
+lb = sortedRatio(lbIdx); %Find actual lower bound value
+ub = sortedRatio(ubIdx); %Find actual higher bound value
 
 %Plot histogram
 nBins = 50;
@@ -49,10 +51,10 @@ figure
 histogram(ratio,nBins);
 xlabel('Ratio')
 %Add lines representing mean and CI of this distribution
-meanRatio=line([mean(ratio) mean(ratio)], [min(ylim) max(ylim)],'color','--k','linewidth',2)
+meanRatio=line([mean(ratio) mean(ratio)], [min(ylim) max(ylim)],'color','k','linestyle','--','linewidth',2)
 CI_lb=line([lb lb], [min(ylim) max(ylim)],'color','k','linewidth',2)
 CI_ub=line([ub ub], [min(ylim) max(ylim)],'color','k','linewidth',2)
-title('Bootstrapped distribution of HA ratios (Aspirin/Placebo)')
+title('Bootstrapped distribution of HA ratios (Aspirin/Placebo)','fontsize',14)
 
 %What are other times you would use bootstrapping? 
 %It's great for estimating CIs because it makes no assumptions about the
