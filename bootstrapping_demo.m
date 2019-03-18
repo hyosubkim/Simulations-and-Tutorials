@@ -56,7 +56,7 @@ CI_lb=line([lb lb], [min(ylim) max(ylim)],'color','k','linewidth',2)
 CI_ub=line([ub ub], [min(ylim) max(ylim)],'color','k','linewidth',2)
 title('Bootstrapped distribution of HA ratios (Aspirin/Placebo)','fontsize',14)
 
-%What are other times you would use bootstrapping? 
+%%%What are other times you would use bootstrapping?%%% 
 %It's great for estimating CIs because it makes no assumptions about the
 %distribution of the data (ie, you can get reliable bootstrapped CIs for 
 %all types of distributions--skewed, uniform, whatever). Why? think Central
@@ -64,3 +64,21 @@ title('Bootstrapped distribution of HA ratios (Aspirin/Placebo)','fontsize',14)
 %especially when your data are non-normally distributed. We'll next go over
 %non-parametric permutation tests, which won't seem as abstract now that
 %you understand the basic idea of resampling.
+
+%%%Where have we seen bootstrapping already?%%%
+%Taylor & Ivry 2011 (aiming model); Smith et al. 2006 (dual-rate model);
+%Charalambous et al. 2018 (fitting behavioral data from chronic stroke
+%participants)
+
+%%%Sample applications of bootstrapping%%%
+%1) You want to calculate confidence intervals on a sample statistic coming
+%from some distribution you are not sure about
+%2) You performed a correlational anlaysis, and you want to get some sense
+%of the uncertainty of your correlation coefficient, or regression weights
+%3) You want to figure out CIs on parameter estimates from a model--e.g.,
+%you fit a state-space model, where A and B are constrained to be between 0
+%and 1
+%4) Just about anything else you can think of...
+
+
+%%%If bored, see also the Jupyter notebook version of this tutorial%%%
