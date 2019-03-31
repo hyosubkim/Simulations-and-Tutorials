@@ -189,3 +189,184 @@ ylabel('Frequency')
 title(['Distribution of test statistics (Tx Groups). Exact p = ', num2str(exactP2,'%1.5f')])
 
 
+clear all; close all; clc
+
+load('adaptationData.mat')
+
+%% Plot group analyzed hand data
+zeroline = zeros(size(hand_ang_m,1));
+figure(1)
+hold on
+set(gcf,'units','inches','pos',[5 5 4.75 2.63]);
+set(gcf,'PaperPositionMode','auto')
+rectangle('position',[0 -10 10 40],'facecolor',gray,'edgecolor',gray)
+rectangle('position',[240 -5 10 40],'facecolor',gray,'edgecolor',gray)
+for i=1:2
+   
+    grpdata(i)=shadedErrorBar(1:length(hand_ang_m),nanmean(hand_ang_m(grp==grpid(i),:)),...
+        nanstderr(hand_ang_m(grp==grpid(i),:)),{'.','markersize',8,'color',grpclrs(i,:)},1);
+    
+end
+xlim([-2 272])
+ylim([-5 30])
+plot(xlim, [0 0],'-k',[10 10], ylim,'--k',[20 20], ylim, '--k',...
+    [240 240], ylim, '--k',[250 250], ylim, '--k')
+title(['Extended 1.75',char(176),' clamp'])
+xlabel('Movement cycle (4 reaches)')
+ylabel(['Hand angle (',char(176),')'])
+% legend([grpdata(1).mainLine,grpdata(2).mainLine],{grplabel{1},grplabel{2}})
+% print('smallTgtOnly','-painters','-dpdf')
+%print('e2_extTgt','-painters','-dpdf')
+
+%% Cluster permutation test:
+
+% This is a very conservative test to see if you have differences between
+% functions in which data at consecutive time points are not independent 
+% of each other (eg, adaptation functions). If you have understood
+% resampling, in general, and non-parametric permutation tests,
+% specifically, you'll see that this is a logical extrapolation of those
+% methods. They use this test in Labruna et al. (2019); to my knowledge,
+% this is the first instance of using this method in an adaptation study.
+% It's more commonly used in studies incorporating EEG and other forms of 
+% neural recordings. 
+
+% Warning: This script takes a long time to run even when resampling < 1000
+% times because you're working with complete time series data rather
+% than discrete values as in previous examples. 
+
+clear all; close all; clc
+
+%load some data from Kim et al. (2019)
+load('adaptationData.mat')
+
+%Plot group analyzed hand data to see two groups adapting to a visual clamp
+%perturbation
+zeroline = zeros(size(hand_ang_m,1));
+figure
+hold on
+set(gcf,'units','inches','pos',[5 5 4.75 2.63]);
+set(gcf,'PaperPositionMode','auto')
+rectangle('position',[0 -10 10 40],'facecolor',gray,'edgecolor',gray)
+rectangle('position',[240 -5 10 40],'facecolor',gray,'edgecolor',gray)
+for i=1:2
+   
+    grpdata(i)=shadedErrorBar(1:length(hand_ang_m),nanmean(hand_ang_m(grp==grpid(i),:)),...
+        nanstderr(hand_ang_m(grp==grpid(i),:)),{'.','markersize',8,'color',grpclrs(i,:)},1);
+    
+end
+xlim([-2 272])
+ylim([-5 30])
+plot(xlim, [0 0],'-k',[10 10], ylim,'--k',[20 20], ylim, '--k',...
+    [240 240], ylim, '--k',[250 250], ylim, '--k')
+title(['Extended 1.75',char(176),' clamp'])
+xlabel('Movement cycle (4 reaches)')
+ylabel(['Hand angle (',char(176),')'])
+% legend([grpdata(1).mainLine,grpdata(2).mainLine],{grplabel{1},grplabel{2}})
+
+
+%moving on to the cluster permutation
+numBslCycles = 20;
+numClampCycles = 220;
+
+%We're going to look at the data cycle-by-cycle and run a continuous series
+%of t-tests (we could use other measure, like difference scores, but t-stat
+%is more conservative)
+for i=1:numClampCycles
+    [~,p(i),~,stats] = ttest2(hand_ang_m(grp==grpid(1),numBslCycles+i),hand_ang_m(grp==grpid(2),numBslCycles+i));
+    t_score(i) = stats.tstat;   
+end
+%creating a logical vector to identify clusters of reliable group
+%differences
+sig_pval = p < .05;
+
+%we pad with 0's at beginning and end to get right indices
+sig_pval = [0 sig_pval 0];
+
+%find the clusters
+edges = diff(sig_pval);
+rising = find(edges==1);
+falling = find(edges==-1);
+
+%check the length of each cluster
+clusterLength = falling - rising;
+
+%make sure cluster has at least 2 adjacent cycles where group differences
+%are reliable
+wideEnough = clusterLength >= 2;
+startPos = rising(wideEnough);
+endPos = falling(wideEnough)-1;  
+for j=1:length(startPos)
+    %sum the t-scores from each significant cluster to get the "mass" of
+    %each cluster
+    clusterMass(j) = sum(t_score(startPos(j):endPos(j)));
+end
+[tsum_data,max_cluster_idx] = max(clusterMass);
+sig_cycles = [startPos(max_cluster_idx): endPos(max_cluster_idx)];
+
+%plot boundaries of largest cluster
+figure(1)
+plot([startPos(max_cluster_idx)+numBslCycles, startPos(max_cluster_idx)+numBslCycles],...
+    [min(ylim) max(ylim)],'--m')
+plot([endPos(max_cluster_idx)+numBslCycles, endPos(max_cluster_idx)+numBslCycles],...
+    [min(ylim) max(ylim)],'--m')    
+
+
+%plot p-values
+figure(2); hold on
+plot(p,'k','linewidth',1.5)
+plot(xlim,[0.05 0.05],'-r')
+xlabel('Cycle number')
+ylabel('p-value')
+
+
+%create the null distribution
+nReshuffles = 1e3;
+for ii=1:nReshuffles
+    
+    %shuffle group assignmenets on every iteration
+    perm_grp = grp(randperm(length(grp)));
+    
+    %we're doing the exact same thing as before, but now with shuffled data
+    %so that we can create the null distribution
+    for jj=1:numClampCycles
+        [~,p_null(i),~,stats_null] = ttest2(hand_ang_m(perm_grp==grpid(1),numBslCycles+i),hand_ang_m(perm_grp==grpid(2),numBslCycles+i));
+        tscore_null(jj) = stats_null.tstat;
+    end
+    
+    %I should probably rename these variables since I used them before, but
+    %I'm leaving them the same for now
+    sig_pval = p_null < .05;
+    sig_pval = [0 sig_pval 0];
+    edges = diff(sig_pval);
+    rising = find(edges==1);
+    falling = find(edges==-1);
+    clusterLength = falling - rising;
+    wideEnough = clusterLength >= 2;
+    startPos = rising(wideEnough);
+    endPos = falling(wideEnough)-1;
+    
+    if startPos
+        for kk=1:length(startPos)
+            t_all_sig(kk) = sum(tscore_null(startPos(kk):endPos(kk)));
+        end
+        tsum_null(ii) = max(t_all_sig);
+    else
+        tsum_null(ii) = 0;
+    end
+    t_all_sig = [];
+    
+end
+
+exact_pval = sum(tsum_null>tsum_data)/nReshuffles
+
+%plot null distribution
+figure; hold on
+histogram(tsum_null,20)
+plot([tsum_data tsum_data],ylim,'--r')
+xlabel('Cluster masses of null distribution')
+ylabel('Frequency')
+title(['P-val: ',num2str(exact_pval)])
+
+
+
+
