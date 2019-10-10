@@ -13,6 +13,8 @@ nBsl = 120;
 nRot = 322;
 nWO = 80;
 
+%% Simulate figure 1
+
 %Parameters from paper
 A=1; B=.02; %Internal Model parameters
 E=1; F=.05; %Strategy parameters
@@ -88,13 +90,13 @@ subplot(1,2,1); hold on
 plot(r_est2,'g','linewidth',3)
 
 
-%% Now we'll create figure 6
+%% Now we'll simulate figure 6
 
 A = .991; %retention factor for adaptation 
-B = .2; %learning rate for adaptation
-E = .98; %retention factor for strategy
-K = 1; %certainty in aiming target location
-F = .15; %learning rate for strategy (how quickly aiming gets adjusted)
+B = .012; %learning rate for adaptation
+E = .999; %retention factor for strategy
+K = .985; %certainty in aiming target location
+F = .023; %learning rate for strategy (how quickly aiming gets adjusted)
 
 s(1:nBsl+2) = [zeros(nBsl+2,1)]; %strategy is zero for baseline and first two rotation
 s(nBsl+3) = 45; %participant told to aim to 45 on 3rd trial of rotation                                      
