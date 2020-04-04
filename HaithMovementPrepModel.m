@@ -43,7 +43,7 @@ for i=1:N
     pH(i) = alpha*(Tp_cd(RT(i)+1)) + (1/8)*(1-Tp_cd(RT(i)+1)); % add 1 to idx 
     H(i,1) = pH(i) > rand;
 end
-% fminshearch will call your max likelihood function (loglik) and find the
+% fminsearch will call your max likelihood function (loglik) and find the
 % best fit parameters (remind me to explain fminsearch and why we use
 % negative log likelihoods)
 [params] = fminsearch(@(x) loglik(x(1),x(2),RT,H), [100,100])   

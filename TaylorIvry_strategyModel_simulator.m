@@ -13,8 +13,6 @@ nBsl = 120;
 nRot = 322;
 nWO = 80;
 
-%% Simulate figure 1
-
 %Parameters from paper
 A=1; B=.02; %Internal Model parameters
 E=1; F=.05; %Strategy parameters
@@ -24,7 +22,6 @@ s(nBsl+3) = 45; %participant told to aim to 45 on 3rd trial of rotation
                                          
 r = [zeros(nBsl,1); ones(nRot,1)*-45; zeros(nWO,1)]; %45 deg VMR
 r_est(1) = 0; %initializing IM (state estimate)
-r_est2(1) = 0;
 
 %create Figure 1
 for n=1:length(r)-1
@@ -33,8 +30,6 @@ for n=1:length(r)-1
     e_tgt(n) = s(n) + (r(n)-r_est(n));  %eqn3: the error you see is the sum
                                         %of your strategy + the rotation - 
                                         %state estimate
-                                        
-    e_tgt2(n) = s(n) + (r(n)-r_est2(n));
     
     e_aim(n) = r(n) - r_est(n);   %eqn4: error signal for adaptation defined
                                   %by location of feedback relative to aim
@@ -43,8 +38,6 @@ for n=1:length(r)-1
     r_est(n+1) = A*r_est(n) + B*e_aim(n); %eqn2: state update is based on 
                                           %aiming error NOT target error 
                                           %(this is key to model)
-                                         
-    r_est2(n+1) = A*r_est2(n) + B*e_tgt2(n);                 
     
     if n<=nBsl+2 
         s(n) = 0;
@@ -86,11 +79,8 @@ line([442 442],ylim,'linestyle','--','color','k')
 plot(r_est,'r','linewidth',3)
 plot(s,'b','linewidth',3)
 
-subplot(1,2,1); hold on
-plot(r_est2,'g','linewidth',3)
 
-
-%% Now we'll simulate figure 6
+%% Now we'll create figure 6
 
 A = .991; %retention factor for adaptation 
 B = .012; %learning rate for adaptation
