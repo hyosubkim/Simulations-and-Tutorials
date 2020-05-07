@@ -320,7 +320,7 @@ ylabel('p-value')
 
 
 %create the null distribution
-nReshuffles = 1e4;
+nReshuffles = 1e2;
 for ii=1:nReshuffles
     
     %shuffle group assignmenets on every iteration
@@ -361,7 +361,7 @@ exact_pval = sum(tsum_null>tsum_data)/nReshuffles
 
 %plot null distribution
 figure; hold on
-histogram(tsum_null)
+histogram(tsum_null, 20)
 plot([tsum_data tsum_data],ylim,'--r')
 xlabel('Cluster masses of null distribution')
 ylabel('Frequency')
